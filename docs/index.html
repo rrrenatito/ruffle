@@ -1,11 +1,57 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta charset="UTF-8">
-    <title>Ruffle Test Page</title>
+    <meta charset="utf-8" />
+    <title>Ruffle Flash Emulator</title>
+    <script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
+    <style>
+      body {
+        background-color: #1a1a1a;
+        color: white;
+        font-family: Arial, sans-serif;
+        text-align: center;
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+      input {
+        margin-top: 15px;
+        padding: 8px 12px;
+        border: none;
+        border-radius: 8px;
+        background: #333;
+        color: white;
+      }
+      ruffle-player {
+        width: 80vw;
+        height: 80vh;
+        margin-top: 10px;
+        border: 2px solid #444;
+        border-radius: 12px;
+        background: black;
+      }
+    </style>
   </head>
   <body>
-    <h1>Ruffle is working!</h1>
-    <script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
+    <h1>Ruffle Flash Emulator</h1>
+    <input type="file" id="file" accept=".swf" />
+    <ruffle-player id="player"></ruffle-player>
+
+    <script>
+      const ruffle = window.RufflePlayer.newest();
+      const player = document.getElementById("player");
+      const fileInput = document.getElementById("file");
+
+      fileInput.addEventListener("change", (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const url = URL.createObjectURL(file);
+          player.load({ url: url });
+        }
+      });
+    </script>
   </body>
 </html>
