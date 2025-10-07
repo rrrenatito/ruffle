@@ -1,56 +1,49 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>Ruffle Flash Emulator</title>
+    <title>Ruffle Emulator</title>
+    <!-- official Ruffle web build (same used by demo) -->
     <script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
     <style>
-      body {
-        background-color: #1a1a1a;
-        color: white;
-        font-family: Arial, sans-serif;
-        text-align: center;
-        margin: 0;
-        height: 100vh;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-      }
-      input {
-        margin-top: 15px;
-        padding: 8px 12px;
-        border: none;
-        border-radius: 8px;
-        background: #333;
-        color: white;
-      }
-      ruffle-player {
-        width: 80vw;
-        height: 80vh;
-        margin-top: 10px;
-        border: 2px solid #444;
-        border-radius: 12px;
-        background: black;
-      }
+      html,body { height:100%; margin:0; background:#111; color:#fff; font-family: sans-serif; }
+      .wrap { display:flex; flex-direction:column; align-items:center; padding:18px; gap:12px; }
+      ruffle-player { width: 90vw; height: 75vh; max-width:1280px; max-height:800px; border-radius:8px; background:#000; }
+      input[type=file] { padding:8px; border-radius:6px; background:#222; color:#fff; border:none; }
     </style>
   </head>
   <body>
-    <h1>Ruffle Flash Emulator</h1>
-    <input type="file" id="file" accept=".swf" />
-    <ruffle-player id="player"></ruffle-player>
+    <div class="wrap">
+      <h1>Ruffle Emulator</h1>
+      <input id="file" type="file" accept=".swf" />
+      <div id="player-container"><ruffle-player id="player"></ruffle-player></div>
+      <div id="status" aria-live="polite"></div>
+    </div>
 
     <script>
-      const ruffle = window.RufflePlayer.newest();
-      const player = document.getElementById("player");
-      const fileInput = document.getElementById("file");
+      // wait until the Ruffle script finishes loading and page is ready
+      window.addEventListener('load', () => {
+        const fileInput = document.getElementById('file');
+        const playerEl  = document.getElementById('player');
+        const status    = document.getElementById('status');
 
-      fileInput.addEventListener("change", (e) => {
-        const file = e.target.files[0];
-        if (file) {
-          const url = URL.createObjectURL(file);
-          player.load({ url: url });
-        }
+        fileInput.addEventListener('change', (e) => {
+          const f = e.target.files[0];
+          if (!f) return;
+          status.textContent = 'Loading ' + f.name + ' …';
+
+          // create a local URL for the selected file and assign it to the ruffle-player
+          const url = URL.createObjectURL(f);
+
+          // simplest, most-compatible approach: set the src attribute on the <ruffle-player>
+          playerEl.setAttribute('src', url);
+
+          // free memory when the page unloads (optional)
+          window.addEventListener('unload', () => URL.revokeObjectURL(url), { once: true });
+
+          // clear status after a sec (Ruffle will run the SWF)
+          setTimeout(() => status.textContent = '', 1200);
+        });
       });
     </script>
   </body>
